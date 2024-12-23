@@ -17,21 +17,21 @@ variable "cidr" {
 
 variable "availability_zones" {
   type    = list(string)
-  default = ""
+  default = [""]
 }
 
 variable "private_subnets" {
-  type = list(map(object({
+  type = list(object({
     name              = string
     cidr              = string
     availability_zone = string
-  })))
+  }))
 }
 
 variable "public_subnets" {
-  type = list(map(object({
+  type = list(object({
     name              = string
     cidr              = string
     availability_zone = string
-  })))
+  }))
 }
