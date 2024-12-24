@@ -28,7 +28,7 @@ variable "public_subnets" {
 
 variable "capacity_providers" {
   type = list(any)
-  default = [ 
+  default = [
     "FARGATE", "FARGATE_SPOT"
-   ]  
+  ]
 }

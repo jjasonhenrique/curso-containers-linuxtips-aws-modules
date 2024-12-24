@@ -1,17 +1,17 @@
 resource "aws_security_group" "vpclink" {
-  name = format("%s-vpclink", var.project_name)
-	vpc_id = data.var.vpc_id
+  name   = format("%s-vpclink", var.project_name)
+  vpc_id = var.vpc_id
 
-	egress  {
-		from_port = 0
-		to_port = 0
-		protocol = "-1"
-		cidr_blocks = ["0.0.0.0/0"]
-	}  
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 resource "aws_security_group_rule" "vpclink_ingress_80" {
-	cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks       = ["0.0.0.0/0"]
   from_port         = 80
   to_port           = 80
   description       = "Liberando porta 80"
@@ -25,47 +25,47 @@ resource "aws_lb" "vpclink" {
   internal           = true
   load_balancer_type = "network"
   security_groups    = [aws_security_group.vpclink.id]
-  subnets = var.private_subnets
+  subnets            = var.private_subnets
 
   enable_cross_zone_load_balancing = false
   enable_deletion_protection       = false
 }
 
 resource "aws_lb_target_group" "vpclink" {
-	name  = format("%s-vpclink", var.project_name)
-	port = 80
-	protocol = "TCP"
-	target_type = "alb"
-	
-	vpc_id = var.vpc_id
+  name        = format("%s-vpclink", var.project_name)
+  port        = 80
+  protocol    = "TCP"
+  target_type = "alb"
 
-	target_health_state {
-		enable_unhealthy_connection_termination = false
-	}
+  vpc_id = var.vpc_id
+
+  target_health_state {
+    enable_unhealthy_connection_termination = false
+  }
 }
 
 resource "aws_lb_listener" "vpclink" {
-	load_balancer_arn = aws_lb.vpclink.arn
+  load_balancer_arn = aws_lb.vpclink.arn
 
-	port = 80
-	protocol = "TCP"
+  port     = 80
+  protocol = "TCP"
 
-	default_action {
-		type = "forward"
-		target_group_arn = aws_lb_target_group.vpclink.arn
-	}
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.vpclink.arn
+  }
 }
 
 resource "aws_lb_target_group_attachment" "internal_lb" {
-	target_group_arn = aws_lb_target_group.vpclink.arn
-	target_id = aws_lb.lb_internal.id
-	port = 80
+  target_group_arn = aws_lb_target_group.vpclink.arn
+  target_id        = aws_lb.internal.id
+  port             = 80
 }
 
 resource "aws_api_gateway_vpc_link" "main" {
-	name  = format("%s-api-gateway", var.project_name)
-	
-	target_arns = [ 
-		aws_lb.vpclink.arn
-	 ]
+  name = format("%s-api-gateway", var.project_name)
+
+  target_arns = [
+    aws_lb.vpclink.arn
+  ]
 }
