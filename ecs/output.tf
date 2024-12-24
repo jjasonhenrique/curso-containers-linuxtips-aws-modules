@@ -3,11 +3,11 @@ output "cluster_name" {
 }
 
 output "load_balancer_dns" {
-  value       = aws_lb.main.dns_name
+  value = aws_lb.main.dns_name
 }
 
 output "internal_load_balancer_dns" {
-  value       = aws_lb.internal.dns_name
+  value = aws_lb.internal.dns_name
 }
 
 output "lb_external_arn" {

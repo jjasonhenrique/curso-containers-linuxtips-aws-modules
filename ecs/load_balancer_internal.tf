@@ -30,19 +30,19 @@ resource "aws_security_group_rule" "internal_ingress_443" {
   type              = "ingress"
 }
 
-resource "aws_lb" "lb_internal" {
+resource "aws_lb" "internal" {
   name               = format("%s-internal", var.project_name)
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.lb_internal.id]
-  subnets = var.private_subnets
+  subnets            = var.private_subnets
 
   enable_cross_zone_load_balancing = false
   enable_deletion_protection       = false
 }
 
 resource "aws_lb_listener" "internal" {
-  load_balancer_arn = aws_lb.lb_internal.arn
+  load_balancer_arn = aws_lb.internal.arn
   port              = 80
   protocol          = "HTTP"
   default_action {
