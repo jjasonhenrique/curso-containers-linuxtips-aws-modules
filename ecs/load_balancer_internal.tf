@@ -21,6 +21,8 @@ resource "aws_security_group_rule" "internal_ingress_80" {
 }
 
 resource "aws_security_group_rule" "internal_ingress_443" {
+  count = length(var.acm_certs) > 0 ? 1 : 0
+
   cidr_blocks       = ["0.0.0.0/0"]
   from_port         = 443
   to_port           = 443
@@ -49,7 +51,26 @@ resource "aws_lb_listener" "internal" {
     type = "fixed-response"
     fixed_response {
       content_type = "text/plain"
-      message_body = "LinuxTips Internal"
+      message_body = format("LinuxTips Internal - %s", var.region)
+      status_code  = "200"
+    }
+  }
+}
+
+resource "aws_lb_listener" "internal_https" {
+
+  count = length(var.acm_certs) > 0 ? 1 : 0
+
+  certificate_arn = var.acm_certs[0]
+
+  load_balancer_arn = aws_lb.internal.arn
+  port              = 443
+  protocol          = "HTTPS"
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = format("LinuxTips Internal HTTPS - %s", var.region)
       status_code  = "200"
     }
   }
