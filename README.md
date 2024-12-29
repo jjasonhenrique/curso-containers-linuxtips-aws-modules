@@ -1,1 +1,0 @@
-# curso-containers-linuxtips-aws-modules
